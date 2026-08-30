@@ -40,10 +40,24 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f2f5;color:#333}
    ============================================================ */
 
 /* চাইলে এখানে সরাসরি আপনার Web App URL বসিয়ে দিন (…/exec) */
-var GS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxx069p4mj7415dIJgOpK9r1MKx7C9ENzsgDeWZAc6YhyW02T4BEkP9BQfogZAYQWwdAg/exec';
+var GS_WEBAPP_URL = '';
 
 var GH_KEY = 'bsa_webapp_url';
 var API_URL = GS_WEBAPP_URL || localStorage.getItem(GH_KEY) || '';
+
+/* শেয়ার করা লিংকে ?gs=<exec-url> থাকলে সেটি সেভ করে নিই —
+   ফলে নতুন ব্রাউজারেও GitHub লিংক সরাসরি কাজ করবে */
+try {
+  var _ghQ = new URLSearchParams(location.search);
+  var _ghGs = _ghQ.get('gs');
+  if (_ghGs && /^https:\/\/script\.google\.com\/.+\/exec/.test(_ghGs) && _ghGs !== API_URL) {
+    localStorage.setItem(GH_KEY, _ghGs);
+    API_URL = _ghGs;
+  }
+} catch (e) {}
+
+/* কোডে URL এমবেড করা থাকলে শেয়ার লিংকে gs= প্যারাম লাগবে না */
+window.GS_API_EMBEDDED = !!GS_WEBAPP_URL;
 
 /* ---------- google.script.run shim (fetch → Apps Script) ---------- */
 function ghRemoteCall(fn, args) {
