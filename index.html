@@ -135,11 +135,14 @@ window.google.script.host = {
 };
 window.google.script.url = {
   getLocation: function (cb) {
-    var p = {};
-    try {
-      new URLSearchParams(location.search).forEach(function (v, k) { p[k] = v; });
-    } catch (e) {}
-    if (cb) cb({ parameter: p, parameters: {}, hash: (location.hash || '').replace('#', '') });
+    /* async রাখি — নেটিভ Apps Script এর মতো, যাতে সব স্ক্রিপ্ট লোড হওয়ার আগে রাউটিং না চলে */
+    setTimeout(function () {
+      var p = {};
+      try {
+        new URLSearchParams(location.search).forEach(function (v, k) { p[k] = v; });
+      } catch (e) {}
+      if (cb) cb({ parameter: p, parameters: {}, hash: (location.hash || '').replace('#', '') });
+    }, 0);
   }
 };
 window.GITHUB_MODE = true;
