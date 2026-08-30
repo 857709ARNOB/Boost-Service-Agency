@@ -3,60 +3,117 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#ffffff">
+  <meta name="theme-color" content="#1a237e">
   <title>Boost Service Agency</title>
+
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     html, body {
-      width: 100%; height: 100%; margin: 0; padding: 0;
-      overflow: hidden; background: #fff; font-family: Arial, sans-serif;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #f0f2f5;
+      font-family: 'Segoe UI', Arial, sans-serif;
     }
+
     .app-frame {
-      position: fixed; inset: 0; width: 100%; height: 100%;
-      border: 0; display: block; background: #fff;
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+      background: #fff;
+      z-index: 1;
     }
+
+    /* Loading screen */
     #loader {
-      position: fixed; inset: 0; z-index: 9999;
-      display: flex; align-items: center; justify-content: center;
-      flex-direction: column; gap: 14px; background: #fff;
-      transition: opacity .25s ease;
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+      background: #ffffff;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
     }
+
     .spinner {
-      width: 42px; height: 42px; border: 4px solid #e8e8e8;
-      border-top-color: #1a73e8; border-radius: 50%;
-      animation: spin .8s linear infinite;
+      width: 48px;
+      height: 48px;
+      border: 4px solid #e2e8f0;
+      border-top-color: #1a73e8;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
     }
-    .loading-text { font-size: 14px; color: #666; font-weight: 600; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    #loader.hidden { opacity: 0; pointer-events: none; }
+
+    .loading-text {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1a237e;
+      letter-spacing: 0.3px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    #loader.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
   </style>
 </head>
+
 <body>
 
+  <!-- Loader -->
   <div id="loader">
     <div class="spinner"></div>
-    <div class="loading-text">Loading application...</div>
+    <div class="loading-text">Loading Boost Service Agency...</div>
   </div>
 
+  <!-- Google Apps Script Web App Frame -->
   <iframe
     id="appFrame"
     class="app-frame"
     title="Boost Service Agency"
     src="https://script.google.com/macros/s/AKfycbxx069p4mj7415dIJgOpK9r1MKx7C9ENzsgDeWZAc6YhyW02T4BEkP9BQfogZAYQWwdAg/exec"
-    allow="clipboard-read; clipboard-write; camera; microphone; geolocation"
-    sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads">
+    allow="clipboard-read; clipboard-write; camera; microphone; geolocation">
   </iframe>
 
   <script>
     const frame = document.getElementById("appFrame");
     const loader = document.getElementById("loader");
 
-    frame.addEventListener("load", function () {
-      setTimeout(function () {
+    function hideLoader() {
+      if (!loader.classList.contains("hidden")) {
         loader.classList.add("hidden");
-        setTimeout(function () { loader.remove(); }, 300);
-      }, 500);
+        setTimeout(() => {
+          loader.style.display = "none";
+        }, 400);
+      }
+    }
+
+    // ১. ফ্রেম লোড হলে লোডার সরে যাবে
+    frame.addEventListener("load", function () {
+      setTimeout(hideLoader, 300);
     });
+
+    // ২. ফলব্যাক টাইমার: কোনো কারণে ইভেন্ট মিস হলেও ৩ সেকেন্ড পর লোডার অটো সরে যাবে
+    setTimeout(hideLoader, 3000);
   </script>
+
 </body>
 </html>
