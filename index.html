@@ -157,9 +157,12 @@ function ghJsonp(url) {
 }
 
 function ghFetchUi() {
-  return fetch(API_URL + (API_URL.indexOf('?') >= 0 ? '&' : '?') + 'api=ui', { method: 'GET' })
+  /* cache-bust: সবসময় সার্ভারের সর্বশেষ UI আনবে (পুরনো ভার্সন আর দেখাবে না) */
+  var sep = API_URL.indexOf('?') >= 0 ? '&' : '?';
+  var url = API_URL + sep + 'api=ui&_t=' + Date.now();
+  return fetch(url, { method: 'GET', cache: 'no-store' })
     .then(function (r) { return r.json(); })
-    .catch(function () { return ghJsonp(API_URL + '?api=ui'); });
+    .catch(function () { return ghJsonp(url); });
 }
 
 function ghLoadScriptsSequentially(list, done) {
