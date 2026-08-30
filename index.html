@@ -1,119 +1,217 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#1a237e">
-  <title>Boost Service Agency</title>
-
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: #f0f2f5;
-      font-family: 'Segoe UI', Arial, sans-serif;
-    }
-
-    .app-frame {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      border: 0;
-      display: block;
-      background: #fff;
-      z-index: 1;
-    }
-
-    /* Loading screen */
-    #loader {
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 16px;
-      background: #ffffff;
-      transition: opacity 0.4s ease, visibility 0.4s ease;
-    }
-
-    .spinner {
-      width: 48px;
-      height: 48px;
-      border: 4px solid #e2e8f0;
-      border-top-color: #1a73e8;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    .loading-text {
-      font-size: 15px;
-      font-weight: 600;
-      color: #1a237e;
-      letter-spacing: 0.3px;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    #loader.hidden {
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover">
+<title>Boost Service Agency</title>
+<link rel="icon" href="data:,">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f2f5;color:#333}
+#gh-boot{position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#667eea,#764ba2);padding:18px}
+#gh-boot .card{background:#fff;border-radius:20px;padding:30px 26px;width:100%;max-width:440px;box-shadow:0 25px 80px rgba(0,0,0,.3);text-align:center}
+#gh-boot h1{font-size:20px;color:#1a237e;margin-bottom:6px;font-weight:800}
+#gh-boot p{font-size:13px;color:#6b7280;line-height:1.7;margin-bottom:16px}
+#gh-boot input{width:100%;padding:12px 14px;border:2px solid #e5e7eb;border-radius:10px;font-size:14px;margin-bottom:12px}
+#gh-boot input:focus{outline:none;border-color:#1a73e8}
+#gh-boot button{width:100%;padding:12px;border:none;border-radius:10px;background:linear-gradient(135deg,#1a237e,#7b1fa2);color:#fff;font-size:15px;font-weight:700;cursor:pointer}
+#gh-boot .err{color:#dc2626;font-size:12px;margin-top:10px;display:none;white-space:pre-wrap}
+#gh-boot .small{font-size:11px;color:#9ca3af;margin-top:12px}
+.gh-spin{width:44px;height:44px;border:4px solid #e5e7eb;border-top-color:#1a73e8;border-radius:50%;animation:ghspin .8s linear infinite;margin:0 auto 14px}
+@keyframes ghspin{to{transform:rotate(360deg)}}
+</style>
 </head>
-
 <body>
 
-  <!-- Loader -->
-  <div id="loader">
-    <div class="spinner"></div>
-    <div class="loading-text">Loading Boost Service Agency...</div>
+<div id="gh-boot">
+  <div class="card" id="ghCard">
+    <div class="gh-spin"></div>
+    <h1>Boost Service Agency</h1>
+    <p>অ্যাপ লোড হচ্ছে...</p>
   </div>
+</div>
 
-  <!-- Google Apps Script Web App Frame -->
-  <iframe
-    id="appFrame"
-    class="app-frame"
-    title="Boost Service Agency"
-    src="https://script.google.com/macros/s/AKfycbxx069p4mj7415dIJgOpK9r1MKx7C9ENzsgDeWZAc6YhyW02T4BEkP9BQfogZAYQWwdAg/exec"
-    allow="clipboard-read; clipboard-write; camera; microphone; geolocation">
-  </iframe>
+<script>
+/* ============================================================
+   GitHub Bridge — Boost Service Agency
+   এই HTML টি GitHub Pages / যেকোনো হোস্টিং এ রাখলেও কাজ করবে।
+   ভিতরের UI + সব ডাটা Google Apps Script Web App থেকেই আসে।
+   Apps Script এর নিজের Index.html ও আগের মতোই কাজ করবে।
+   ============================================================ */
 
-  <script>
-    const frame = document.getElementById("appFrame");
-    const loader = document.getElementById("loader");
+/* চাইলে এখানে সরাসরি আপনার Web App URL বসিয়ে দিন (…/exec) */
+var GS_WEBAPP_URL = '';
 
-    function hideLoader() {
-      if (!loader.classList.contains("hidden")) {
-        loader.classList.add("hidden");
-        setTimeout(() => {
-          loader.style.display = "none";
-        }, 400);
-      }
+var GH_KEY = 'bsa_webapp_url';
+var API_URL = GS_WEBAPP_URL || localStorage.getItem(GH_KEY) || '';
+
+/* ---------- google.script.run shim (fetch → Apps Script) ---------- */
+function ghRemoteCall(fn, args) {
+  return fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // preflight এড়ানোর জন্য
+    body: JSON.stringify({ fn: fn, args: args || [] })
+  }).then(function (r) { return r.json(); }).then(function (j) {
+    if (!j || j.ok !== true) throw new Error((j && j.error) || 'Server error');
+    return j.result;
+  });
+}
+
+function ghMakeRunner(success, failure) {
+  var handler = {
+    get: function (t, prop) {
+      if (prop === 'withSuccessHandler') return function (fn) { return ghMakeRunner(fn, failure); };
+      if (prop === 'withFailureHandler') return function (fn) { return ghMakeRunner(success, fn); };
+      if (prop === 'withUserObject') return function () { return ghMakeRunner(success, failure); };
+      if (typeof prop !== 'string') return undefined;
+      return function () {
+        var args = Array.prototype.slice.call(arguments);
+        ghRemoteCall(prop, args).then(function (res) {
+          if (success) success(res);
+        }).catch(function (err) {
+          if (failure) failure(err); else console.error('[GS ' + prop + ']', err);
+        });
+      };
     }
+  };
+  return new Proxy({}, handler);
+}
 
-    // ১. ফ্রেম লোড হলে লোডার সরে যাবে
-    frame.addEventListener("load", function () {
-      setTimeout(hideLoader, 300);
-    });
+window.google = window.google || {};
+window.google.script = window.google.script || {};
+window.google.script.run = ghMakeRunner(null, null);
+window.google.script.host = {
+  close: function () {},
+  setHeight: function () {},
+  setWidth: function () {},
+  origin: location.origin,
+  editor: { focus: function () {} }
+};
+window.google.script.url = {
+  getLocation: function (cb) {
+    var p = {};
+    try {
+      new URLSearchParams(location.search).forEach(function (v, k) { p[k] = v; });
+    } catch (e) {}
+    if (cb) cb({ parameter: p, parameters: {}, hash: (location.hash || '').replace('#', '') });
+  }
+};
+window.GITHUB_MODE = true;
+window.GS_API_URL = API_URL;
 
-    // ২. ফলব্যাক টাইমার: কোনো কারণে ইভেন্ট মিস হলেও ৩ সেকেন্ড পর লোডার অটো সরে যাবে
-    setTimeout(hideLoader, 3000);
-  </script>
+/* ---------- UI loader ---------- */
+function ghShowSetup(msg) {
+  var card = document.getElementById('ghCard');
+  card.innerHTML =
+    '<h1>🔗 Web App URL দিন</h1>' +
+    '<p>Google Apps Script এ <b>Deploy → Web app</b> করে (Access: Anyone) যে <b>/exec</b> লিংক পাবেন সেটি এখানে বসান। একবার দিলেই ব্রাউজারে সেভ থাকবে।</p>' +
+    '<input id="ghUrl" placeholder="https://script.google.com/macros/s/…/exec" value="' + (API_URL || '') + '">' +
+    '<button id="ghGo">অ্যাপ চালু করুন</button>' +
+    '<div class="err" id="ghErr"></div>' +
+    '<div class="small">URL পরিবর্তন করতে: ব্রাউজার কনসোলে <code>localStorage.removeItem("bsa_webapp_url")</code></div>';
+  if (msg) { var e = document.getElementById('ghErr'); e.style.display = 'block'; e.textContent = msg; }
+  document.getElementById('ghGo').onclick = function () {
+    var v = (document.getElementById('ghUrl').value || '').trim();
+    if (!/^https:\/\/script\.google\.com\/.+\/exec/.test(v)) {
+      var er = document.getElementById('ghErr');
+      er.style.display = 'block';
+      er.textContent = 'সঠিক /exec লিংক দিন।';
+      return;
+    }
+    localStorage.setItem(GH_KEY, v);
+    location.reload();
+  };
+}
 
+function ghBusy(text) {
+  var card = document.getElementById('ghCard');
+  if (card) card.innerHTML = '<div class="gh-spin"></div><h1>Boost Service Agency</h1><p>' + text + '</p>';
+}
+
+/* JSONP fallback (কোনো কারণে CORS ব্লক হলে) */
+function ghJsonp(url) {
+  return new Promise(function (resolve, reject) {
+    var cb = 'ghcb_' + Date.now() + Math.floor(Math.random() * 1000);
+    var s = document.createElement('script');
+    var timer = setTimeout(function () { cleanup(); reject(new Error('Timeout')); }, 60000);
+    function cleanup() { clearTimeout(timer); delete window[cb]; if (s.parentNode) s.parentNode.removeChild(s); }
+    window[cb] = function (data) { cleanup(); resolve(data); };
+    s.onerror = function () { cleanup(); reject(new Error('Network error')); };
+    s.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'callback=' + cb;
+    document.body.appendChild(s);
+  });
+}
+
+function ghFetchUi() {
+  return fetch(API_URL + (API_URL.indexOf('?') >= 0 ? '&' : '?') + 'api=ui', { method: 'GET' })
+    .then(function (r) { return r.json(); })
+    .catch(function () { return ghJsonp(API_URL + '?api=ui'); });
+}
+
+function ghLoadScriptsSequentially(list, done) {
+  var i = 0;
+  (function next() {
+    if (i >= list.length) return done();
+    var old = list[i++];
+    var s = document.createElement('script');
+    for (var a = 0; a < old.attributes.length; a++) {
+      s.setAttribute(old.attributes[a].name, old.attributes[a].value);
+    }
+    if (old.src) {
+      s.onload = next;
+      s.onerror = next;
+      document.head.appendChild(s);
+    } else {
+      s.text = old.textContent;
+      document.body.appendChild(s);
+      next();
+    }
+  })();
+}
+
+function ghMountUi(html) {
+  var doc = new DOMParser().parseFromString(html, 'text/html');
+
+  /* head এর style/link গুলো নিয়ে আসি */
+  doc.querySelectorAll('style,link[rel="stylesheet"]').forEach(function (n) {
+    document.head.appendChild(n.cloneNode(true));
+  });
+
+  /* script গুলো আলাদা করে রাখি, বাকি DOM বসাই */
+  var scripts = Array.prototype.slice.call(doc.querySelectorAll('script'));
+  scripts.forEach(function (s) { if (s.parentNode) s.parentNode.removeChild(s); });
+
+  document.title = (doc.title || 'Boost Service Agency');
+  var boot = document.getElementById('gh-boot');
+  document.body.innerHTML = doc.body.innerHTML;
+  if (boot) document.body.appendChild(boot);
+
+  /* body এর ক্লাস/স্টাইল কপি */
+  if (doc.body.className) document.body.className = doc.body.className;
+  if (doc.body.getAttribute('style')) document.body.setAttribute('style', doc.body.getAttribute('style'));
+
+  ghLoadScriptsSequentially(scripts, function () {
+    var b = document.getElementById('gh-boot');
+    if (b) b.remove();
+    try { window.dispatchEvent(new Event('load')); } catch (e) {}
+    try { document.dispatchEvent(new Event('DOMContentLoaded')); } catch (e) {}
+  });
+}
+
+function ghStart() {
+  if (!API_URL) return ghShowSetup('');
+  ghBusy('সার্ভার থেকে অ্যাপ আনা হচ্ছে...');
+  ghFetchUi().then(function (j) {
+    if (!j || j.ok !== true || !j.html) throw new Error((j && j.error) || 'UI পাওয়া যায়নি');
+    ghMountUi(j.html);
+  }).catch(function (err) {
+    ghShowSetup('লোড হয়নি: ' + ((err && err.message) || err) +
+      '\n• Web App টি "Anyone" access দিয়ে Deploy করা আছে কি?\n• Code.gs এর নতুন ভার্সন পেস্ট করে আবার Deploy করেছেন কি?');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', ghStart);
+if (document.readyState !== 'loading') ghStart();
+</script>
 </body>
 </html>
