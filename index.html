@@ -1,31 +1,117 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Boost Service Agency</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#ffffff">
+  <title>Boost Service Agency</title>
 
-    <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-        iframe {
-            width: 100%;
-            height: 100vh;
-            border: 0;
-        }
-    </style>
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    .app-frame {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100dvh;
+      border: 0;
+      display: block;
+      background: #fff;
+    }
+
+    /* Loading screen */
+    #loader {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 14px;
+      background: #fff;
+      transition: opacity .25s ease;
+    }
+
+    .spinner {
+      width: 42px;
+      height: 42px;
+      border: 4px solid #e8e8e8;
+      border-top-color: #ff6b00;
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+
+    .loading-text {
+      font-size: 14px;
+      color: #666;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    #loader.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+  </style>
 </head>
 
 <body>
 
-<iframe
-src="https://script.google.com/macros/s/AKfycbwoT-8NBKnMeNqTezGp-bAn0jfJshaYiPtP_uIoUDtoJ9k8uOFHkFxaivCsqsdgPHB7sg/exec">
-</iframe>
+  <div id="loader">
+    <div class="spinner"></div>
+    <div class="loading-text">Loading application...</div>
+  </div>
+
+  <iframe
+    id="appFrame"
+    class="app-frame"
+    title="Boost Service Agency"
+    src="https://script.google.com/macros/s/AKfycbwoT-8NBKnMeNqTezGp-bAn0jfJshaYiPtP_uIoUDtoJ9k8uOFHkFxaivCsqsdgPHB7sg/exec"
+    allow="clipboard-read; clipboard-write; camera; microphone; geolocation"
+    referrerpolicy="strict-origin-when-cross-origin">
+  </iframe>
+
+  <script>
+    const frame = document.getElementById("appFrame");
+    const loader = document.getElementById("loader");
+
+    frame.addEventListener("load", function () {
+      setTimeout(function () {
+        loader.classList.add("hidden");
+        setTimeout(function () {
+          loader.remove();
+        }, 300);
+      }, 250);
+    });
+
+    // Prevent accidental page scrolling on mobile.
+    document.addEventListener("touchmove", function (e) {
+      if (e.target === document.documentElement || e.target === document.body) {
+        e.preventDefault();
+      }
+    }, { passive: false });
+  </script>
 
 </body>
 </html>
