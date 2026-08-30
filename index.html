@@ -19,6 +19,10 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f2f5;color:#333}
 #gh-boot .small{font-size:11px;color:#9ca3af;margin-top:12px}
 .gh-spin{width:44px;height:44px;border:4px solid #e5e7eb;border-top-color:#1a73e8;border-radius:50%;animation:ghspin .8s linear infinite;margin:0 auto 14px}
 @keyframes ghspin{to{transform:rotate(360deg)}}
+/* অ্যাক্টিভিটি পিল: শুধু ঘুরন্ত আইকন — কোনো লেখা থাকবে না (পুরনো Index.html হলেও কাজ করবে) */
+#activityPill{font-size:0!important;gap:0!important;width:52px!important;height:52px!important;padding:0!important;border-radius:50%!important;justify-content:center!important}
+#activityPill .ap-cnt{font-size:13px!important}
+@keyframes apSpin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -27,7 +31,6 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f2f5;color:#333}
   <div class="card" id="ghCard">
     <div class="gh-spin"></div>
     <h1>Boost Service Agency</h1>
-    <p>অ্যাপ লোড হচ্ছে...</p>
   </div>
 </div>
 
@@ -137,9 +140,9 @@ function ghShowSetup(msg) {
   };
 }
 
-function ghBusy(text) {
+function ghBusy() {
   var card = document.getElementById('ghCard');
-  if (card) card.innerHTML = '<div class="gh-spin"></div><h1>Boost Service Agency</h1><p>' + text + '</p>';
+  if (card) card.innerHTML = '<div class="gh-spin"></div><h1>Boost Service Agency</h1>';
 }
 
 /* JSONP fallback (কোনো কারণে CORS ব্লক হলে) */
